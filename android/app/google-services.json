@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "920029589553",
+    "project_id": "flutterlearning-f90d7",
+    "storage_bucket": "flutterlearning-f90d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920029589553:android:c332149461f3f6256e2510",
+        "android_client_info": {
+          "package_name": "com.shehata.social_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "920029589553-ln7ghdbrl9mn82rbor9o92acout9p0mf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shehata.social_app",
+            "certificate_hash": "7795644a4f036adf7712b59085ad1ba7f837a83b"
+          }
+        },
+        {
+          "client_id": "920029589553-lmmsgi2t43sih1qubo6sgtpluds0khsn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK4GliVBnA74h-laKGTYF7AcqWsDhsMp4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "920029589553-lmmsgi2t43sih1qubo6sgtpluds0khsn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
