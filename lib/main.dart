@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app/layout/layout_screen.dart';
 import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/shared/bloc/bloc_observer.dart';
 import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/network/local/cache_helper.dart';
 import 'package:social_app/shared/styles/themes.dart';
 
+import 'layout/cubit/cubit.dart';
 import 'modules/login/login_screen.dart';
 import 'modules/onboard/onboard_screen.dart';
 
@@ -23,7 +25,7 @@ void main() async {
   uid = CacheHelper.getData(key: 'uid');
   if (onBoarding != null) {
     if (uid != null)
-      widget = HomeScreen();
+      widget = LayoutScreen();
     else
       widget = LoginScreen();
   } else {
@@ -42,11 +44,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shop App',
-      theme: lightTheme,
-      debugShowCheckedModeBanner: false,
-      home: widget,
+    return BlocProvider(
+      create: (context) => HomeCubit(),
+      child: MaterialApp(
+        title: 'Shop App',
+        theme: lightTheme,
+        debugShowCheckedModeBanner: false,
+        home: widget,
+      ),
     );
   }
 }
