@@ -4,10 +4,10 @@ import 'package:social_app/shared/network/local/cache_helper.dart';
 
 import 'components.dart';
 
-var token;
+var uid;
 
 void signOut(BuildContext context){
-  CacheHelper.clearData(key: 'token').then((value) {
+  CacheHelper.clearData(key: 'uid').then((value) {
     if (value) navigateAndFinish( context, LoginScreen());
   });
 }

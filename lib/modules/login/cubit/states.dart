@@ -6,7 +6,9 @@ class LoginInitState extends LoginCubitStates {}
 class LoginLoadingState extends LoginCubitStates {}
 
 class LoginSuccessState extends LoginCubitStates {
+  final String uid;
 
+  LoginSuccessState(this.uid);
 
 }
 

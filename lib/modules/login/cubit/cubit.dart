@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/modules/login/cubit/states.dart';
@@ -23,6 +24,23 @@ class LoginCubit extends Cubit<LoginCubitStates> {
   //     emit(LoginErrorState());
   //   });
   // }
+
+  void userLogin(String email, String password){
+
+    emit(LoginLoadingState());
+    FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password
+    ).then((value)  {
+      print(value.user.uid);
+      emit(LoginSuccessState(value.user.uid));
+
+    }).catchError((error){
+      print(error);
+      emit(LoginErrorState());
+
+    });
+  }
 
   IconData suffix = Icons.visibility;
   bool isPass = true;

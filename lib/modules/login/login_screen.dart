@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/modules/login/cubit/cubit.dart';
 import 'package:social_app/modules/login/cubit/states.dart';
 import 'package:social_app/modules/register/register_screen.dart';
 import 'package:social_app/shared/components/components.dart';
+import 'package:social_app/shared/network/local/cache_helper.dart';
 
 class LoginScreen extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
@@ -18,20 +20,17 @@ class LoginScreen extends StatelessWidget {
         create: (BuildContext context) => LoginCubit(),
         child: BlocConsumer<LoginCubit, LoginCubitStates>(
           listener: (context, state) {
-            // if (state is LoginSuccessState) {
-            //   if (state.loginModel.status) {
-            //     toastMessage(state.loginModel.message, 'Success');
-            //
-            //     print(state.loginModel.message);
-            //     CacheHelper.setData(key: 'token', value: state.loginModel.data.token).then((value) {
-            //       // Important when you logout so you should have the token saved when login again as token saved only in main initialization
-            //       token = state.loginModel.data.token;
-            //       navigateAndFinish(context, AppLayoutScreen());
-            //     });
-            //   } else {
-            //     toastMessage(state.loginModel.message, 'Error');
-            //   }
-            // }
+            if (state is LoginSuccessState) {
+                toastMessage("Login successfully", 'Success');
+
+                CacheHelper.setData(key: 'uid', value: state.uid).then((value) {
+                  // // Important when you logout so you should have the token saved when login again as token saved only in main initialization
+                  // token = state.loginModel.data.token;
+                  navigateAndFinish(context, HomeScreen());
+                });
+              } else if (state is LoginErrorState) {
+                toastMessage("Login Failed", 'Error');
+              }
           },
           builder: (context, state) {
             var cubit = LoginCubit.get(context);
@@ -69,9 +68,9 @@ class LoginScreen extends StatelessWidget {
                               prefix: Icons.email_outlined,
                               label: "Email Address",
                               onSubmit: (value){
-                                // if (formKey.currentState.validate()) {
-                                //   cubit.userLogin(emailController.text, passwordController.text);
-                                // }
+                                if (formKey.currentState.validate()) {
+                                  cubit.userLogin(emailController.text, passwordController.text);
+                                }
                               },
                               validate: (String text) {
                                 if (text.isEmpty) {
@@ -89,9 +88,9 @@ class LoginScreen extends StatelessWidget {
                               suffix: cubit.suffix,
                               isPassword: cubit.isPass,
                               onSubmit: (value){
-                                // if (formKey.currentState.validate()) {
-                                //   cubit.userLogin(emailController.text, passwordController.text);
-                                // }
+                                if (formKey.currentState.validate()) {
+                                  cubit.userLogin(emailController.text, passwordController.text);
+                                }
                               },
                               suffixPressed: () {
                                 cubit.changePassVisibility();
@@ -109,9 +108,9 @@ class LoginScreen extends StatelessWidget {
                               : defaultButton(
                                   label: "LOGIN",
                                   onPressed: () {
-                                    // if (formKey.currentState.validate()) {
-                                    //   cubit.userLogin(emailController.text, passwordController.text);
-                                    // }
+                                    if (formKey.currentState.validate()) {
+                                      cubit.userLogin(emailController.text, passwordController.text);
+                                    }
                                   }),
                           SizedBox(
                             height: 25,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/modules/register/cubit/cubit.dart';
 import 'package:social_app/modules/register/cubit/states.dart';
 import 'package:social_app/shared/components/components.dart';
+import 'package:social_app/shared/network/local/cache_helper.dart';
 
 class RegisterScreen extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
@@ -19,21 +21,12 @@ class RegisterScreen extends StatelessWidget {
         create: (BuildContext context) => RegisterCubit(),
         child: BlocConsumer<RegisterCubit, RegisterCubitStates>(
           listener: (context, state) {
-            // if (state is RegisterSuccessState) {
-            //   if (state.loginModel.status) {
-            //     print(state.loginModel.message);
-            //     CacheHelper.setData(key: 'token', value: state.loginModel.data.token).then((value) {
-            //       navigateAndFinish(context, AppLayoutScreen());
-            //     });
-            //
-            //     //Todo
-            //     //Toast message for success
-            //   } else {
-            //     //Todo
-            //     //Toast message for error
-            //     print(state.loginModel.message);
-            //   }
-            // }
+            if (state is RegisterCreateUserSuccessState) {
+                CacheHelper.setData(key: 'uid', value: state.uid).then((value) {
+                  navigateAndFinish(context, HomeScreen());
+                });
+
+              }
           },
           builder: (context, state) {
             var cubit = RegisterCubit.get(context);
@@ -134,7 +127,9 @@ class RegisterScreen extends StatelessWidget {
                               onPressed: () {
                                 if (formKey.currentState.validate()) {
                                   cubit.userRegister(
-                                      email:emailController.text,
+                                      name:nameController.text,
+                                      email: emailController.text,
+                                      phone:phoneController.text,
                                       password: passwordController.text
                                   );
                                 }
