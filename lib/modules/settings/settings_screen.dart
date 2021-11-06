@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/layout/cubit/cubit.dart';
 import 'package:social_app/layout/cubit/states.dart';
+import 'package:social_app/modules/editUser/editUser_screen.dart';
+import 'package:social_app/shared/components/components.dart';
 import 'package:social_app/shared/styles/colors.dart';
 import 'package:social_app/shared/styles/icon_broken.dart';
 
@@ -30,8 +32,7 @@ class SettingsScreen extends StatelessWidget {
                           topRight: Radius.circular(10),
                         ),
                         image: DecorationImage(
-                            image: NetworkImage(cubit.userModel.coverImage,
-                            ),
+                            image: cubit.coverImage != null ? FileImage(cubit.coverImage):NetworkImage(cubit.userModel.coverImage),
                             fit: BoxFit.cover
                         ),
                       ),
@@ -43,8 +44,7 @@ class SettingsScreen extends StatelessWidget {
                         backgroundColor: Colors.white,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:NetworkImage(cubit.userModel.profileImage
-                          ),
+                          backgroundImage:cubit.profileImage != null ? FileImage(cubit.profileImage):NetworkImage(cubit.userModel.profileImage),
                         ),
                       ),
                     )
@@ -80,7 +80,9 @@ class SettingsScreen extends StatelessWidget {
                   Expanded(
                       flex: 1,
                       child: OutlinedButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            navigateTo(context, EditUserScreen());
+                          },
                           child: Icon(IconBroken.Edit_Square,
                             size: 20,)
                       )
