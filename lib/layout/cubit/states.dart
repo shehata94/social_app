@@ -10,3 +10,9 @@ class HomeSuccessState extends HomeStates{}
 class HomeErrorState extends HomeStates{}
 
 class HomeChangeBotNavBar extends HomeStates{}
+
+class HomeGetUserLoadingState extends HomeStates{}
+
+class HomeGetUserSuccessState extends HomeStates{}
+
+class HomeGetUserErrorState extends HomeStates{}

@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/layout/layout_screen.dart';
-import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/shared/bloc/bloc_observer.dart';
 import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/network/local/cache_helper.dart';
@@ -18,7 +17,6 @@ void main() async {
   await Firebase.initializeApp();
   await CacheHelper.init();
   Bloc.observer = MyBlocObserver();
-
 
   Widget widget;
   final onBoarding = CacheHelper.getData(key: 'onBoarding');
@@ -45,7 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit(),
+      create: (context) => HomeCubit()..getUserData(),
       child: MaterialApp(
         title: 'Shop App',
         theme: lightTheme,
