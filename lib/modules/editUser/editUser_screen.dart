@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/layout/cubit/cubit.dart';
 import 'package:social_app/layout/cubit/states.dart';
 import 'package:social_app/shared/components/components.dart';
-import 'package:social_app/shared/styles/colors.dart';
 import 'package:social_app/shared/styles/icon_broken.dart';
 
 class EditUserScreen extends StatelessWidget {
@@ -25,32 +24,17 @@ class EditUserScreen extends StatelessWidget {
         bioController.text = cubit.userModel.bio;
 
         return  Scaffold(
-            appBar: AppBar(
-              title: Text('Edit Profile'),
-              titleSpacing: 5,
-              leading: IconButton(
-                icon: Icon(IconBroken.Arrow___Left_2),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-              ),
-              actions: [
-                TextButton(
-                    onPressed: (){
-                      cubit.updateUserData(
-                        name: nameController.text,
-                        phone: phoneController.text,
-                        bio: bioController.text
-                      );
-                    },
-                    child: Text(
-                      'UPDATE',
-                      style: Theme.of(context).textTheme.bodyText1.copyWith(
-                          color: primaryColor
-                      ),
-                    )),
-                SizedBox(width: 10,)
-              ],
+            appBar: appBar(
+              context: context,
+              title: "Edit Profile",
+              actionText: "UPDATE",
+              onPressed: (){
+                cubit.uploadImagesAndData(
+                    name: nameController.text,
+                    phone: phoneController.text,
+                    bio: bioController.text
+                );
+              }
             ),
             body: SingleChildScrollView(
               child: Padding(

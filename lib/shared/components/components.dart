@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:social_app/shared/styles/colors.dart';
+import 'package:social_app/shared/styles/icon_broken.dart';
 
 void navigateAndFinish(context, screen) {
   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => screen), (route) => false);
@@ -22,8 +23,8 @@ Widget defaultTextForm(
         Function suffixPressed,
         Function onTap,
         Function onChange,
-          String initValue
-
+        String initValue,
+        InputBorder border
         }) =>
     TextFormField(
       initialValue: initValue,
@@ -31,7 +32,7 @@ Widget defaultTextForm(
       controller: controller,
       keyboardType: inputType,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: border??OutlineInputBorder(),
         prefixIcon: Icon(
           prefix,
         ),
@@ -65,19 +66,20 @@ Widget defaultButton(
       ),
     );
 
-enum toastStates {Success,Error,Warning}
+enum toastStates { Success, Error, Warning }
 
-void toastMessage(String msg, toastStates){
-  var color ;
-  switch(toastStates){
-    case 'Success': color = Colors.green;
+void toastMessage(String msg, toastStates) {
+  var color;
+  switch (toastStates) {
+    case 'Success':
+      color = Colors.green;
       break;
-    case 'Error': color = Colors.red;
+    case 'Error':
+      color = Colors.red;
       break;
-    case 'Warning': color = Colors.amber;
+    case 'Warning':
+      color = Colors.amber;
       break;
-
-
   }
 
   Fluttertoast.showToast(
@@ -87,99 +89,117 @@ void toastMessage(String msg, toastStates){
       timeInSecForIosWeb: 1,
       backgroundColor: color,
       textColor: Colors.white,
-      fontSize: 16.0
-  );
-
-
+      fontSize: 16.0);
 }
 
-Widget divider() =>Container(
-  height: 1,
-  color: Colors.grey,
-);
+Widget divider() => Container(
+      height: 1,
+      color: Colors.grey,
+    );
 
-Widget listItem( model,  cubit, {bool isSearch = true}) => Padding(
-  padding: const EdgeInsets.all(10.0),
-  child: Row(
-    children: [
-      Container(
-        height: 130,
-        width: 130,
-        child: Stack(
-          children: [
-            Image(
-              image: NetworkImage(model.image),
-              width: 130,
-              height: 130,
-            ),
-            model.discount != 0 && isSearch
-                ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                color: Colors.red,
-                child: Text(
-                  'DISCOUNT',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            )
-                : SizedBox(),
-          ],
-        ),
-      ),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              model.name,
-              maxLines: 2,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
+Widget listItem(model, cubit, {bool isSearch = true}) => Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          Container(
+            height: 130,
+            width: 130,
+            child: Stack(
               children: [
-                Text(
-                  '${model.price}',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
+                Image(
+                  image: NetworkImage(model.image),
+                  width: 130,
+                  height: 130,
                 ),
                 model.discount != 0 && isSearch
-                    ? Text(
-                  '${model.oldPrice}',
-                  style: TextStyle(color: primaryColor, decoration: TextDecoration.lineThrough),
-                )
-                    : SizedBox(
-                  width: 10,
-                ),
-                Spacer(),
-                CircleAvatar(
-                  radius: 20,
-                   backgroundColor: cubit.favourites[model.id]? primaryColor: Colors.grey,
-                  child: IconButton(
-                      onPressed: () {
-                        cubit.changeFavourites(model);
-                      },
-                      icon: Icon(
-                        Icons.favorite_border,
-                        color: Colors.white,
-                      )),
-                )
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          color: Colors.red,
+                          child: Text(
+                            'DISCOUNT',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : SizedBox(),
               ],
             ),
-          ],
-        ),
-      )
-    ],
-  ),
-);
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  model.name,
+                  maxLines: 2,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '${model.price}',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    model.discount != 0 && isSearch
+                        ? Text(
+                            '${model.oldPrice}',
+                            style: TextStyle(color: primaryColor, decoration: TextDecoration.lineThrough),
+                          )
+                        : SizedBox(
+                            width: 10,
+                          ),
+                    Spacer(),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: cubit.favourites[model.id] ? primaryColor : Colors.grey,
+                      child: IconButton(
+                          onPressed: () {
+                            cubit.changeFavourites(model);
+                          },
+                          icon: Icon(
+                            Icons.favorite_border,
+                            color: Colors.white,
+                          )),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
 
+Widget appBar({BuildContext context, Function onPressed, String title, String actionText}) => AppBar(
+      title: Text(title),
+      titleSpacing: 5,
+      leading: IconButton(
+        icon: Icon(IconBroken.Arrow___Left_2),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      actions: [
+        TextButton(
+            onPressed: onPressed,
+            child: Text(
+              actionText,
+              style: Theme.of(context).textTheme.bodyText1.copyWith(color: primaryColor),
+            )),
+        SizedBox(
+          width: 10,
+        )
+      ],
+    );

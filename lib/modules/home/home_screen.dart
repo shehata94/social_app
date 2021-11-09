@@ -1,54 +1,67 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app/layout/cubit/cubit.dart';
+import 'package:social_app/layout/cubit/states.dart';
+import 'package:social_app/models/post_model.dart';
 import 'package:social_app/shared/styles/icon_broken.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-        return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  Card(
-                    elevation: 10,
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Image(
-                          image: NetworkImage(
-                              'https://image.freepik.com/free-photo/cheerful-young-woman-poses-torn-yellow-paper-hole-background-emotional-expressive_155003-7248.jpg'),
-                          height: 220,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Communicate with friends',
-                            style: Theme.of(context).textTheme.bodyText1.copyWith(
-                              fontSize: 17,
+        return BlocConsumer<HomeCubit, HomeStates>(
+          listener: (context, state){},
+          builder: (context, state){
+            var cubit = HomeCubit.get(context);
+            return
+            cubit.posts.length > 0
+                ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    Card(
+                      elevation: 10,
+                      clipBehavior: Clip.antiAlias,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Image(
+                            image: NetworkImage(
+                                'https://image.freepik.com/free-photo/cheerful-young-woman-poses-torn-yellow-paper-hole-background-emotional-expressive_155003-7248.jpg'),
+                            height: 220,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Communicate with friends',
+                              style: Theme.of(context).textTheme.bodyText1.copyWith(
+                                fontSize: 17,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                      itemCount: 10,
-                      itemBuilder: (context, index) => postItem(context)),
-                  SizedBox(height: 120,)
+                    ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: cubit.posts.length,
+                        itemBuilder: (context, index) => postItem(context, cubit.posts[index],cubit)),
+                    SizedBox(height: 120,)
 
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
+            )
+                : Center(child: CircularProgressIndicator());
+          },
+        );
   }
 
   final hasTages = List<Widget>.generate(8, (index) => InkWell(
@@ -65,7 +78,9 @@ class HomeScreen extends StatelessWidget {
     onTap: (){},
   ));
 
-  Widget postItem(BuildContext context) =>  Card(
+  Widget postItem(BuildContext context, PostModel postModel, HomeCubit cubit)  {
+
+    return Card(
     elevation: 5,
     child: Padding(
       padding: const EdgeInsets.all(12.0),
@@ -77,7 +92,7 @@ class HomeScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 backgroundImage: NetworkImage(
-                    "https://image.freepik.com/free-photo/image-happy-man-checking-out-promo-looking-left-with-amazement-standing-white-t-shirt-against-yellow-background_1258-73698.jpg"
+                    postModel.profileImage
                 ),
               ),
               SizedBox(width: 20,),
@@ -86,7 +101,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text('Karim Shehata',
+                      Text(postModel.name,
                         style: Theme.of(context).textTheme.bodyText1,),
                       SizedBox(width: 5,),
                       Icon(Icons.verified,
@@ -96,7 +111,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 5,),
-                  Text('January 21, 2021 at 11:00 pm',
+                  Text(postModel.date,
                     style: Theme.of(context).textTheme.subtitle2.copyWith(
                         color: Colors.grey
                     ),),
@@ -114,31 +129,33 @@ class HomeScreen extends StatelessWidget {
             height: 1,
             color: Colors.grey[200],
           ),
-          Text('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+          Text(postModel.postText,
             style: Theme.of(context).textTheme.bodyText2.copyWith(
                 fontSize: 15,
                 fontWeight: FontWeight.w500
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical:8.0),
-            child: Wrap(
-                children: hasTages
-
-            ),
-          ),
-          Card(
+          SizedBox(height: 10,),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical:8.0),
+          //   child: Wrap(
+          //       children: hasTages
+          //
+          //   ),
+          // ),
+          postModel.postImage != ''
+              ? Card(
             margin: EdgeInsets.all(0),
             clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             child: Image(
-              image: NetworkImage(
-                  'https://image.freepik.com/free-photo/impressed-surprised-man-points-away-blank-space_273609-40694.jpg'),
+              image: NetworkImage(postModel.postImage),
               height: 180,
               width: double.infinity,
               fit: BoxFit.cover,
             ),
-          ),
+          )
+              :SizedBox(height: 10),
           Row(
             children: [
               Row(
@@ -172,7 +189,6 @@ class HomeScreen extends StatelessWidget {
                   Text('25 Comments'),
                 ],
               ),
-
             ],
           ),
           Container(
@@ -186,7 +202,7 @@ class HomeScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 20,
                 backgroundImage: NetworkImage(
-                    "https://image.freepik.com/free-photo/image-happy-man-checking-out-promo-looking-left-with-amazement-standing-white-t-shirt-against-yellow-background_1258-73698.jpg"
+                   cubit.userModel.profileImage
                 ),
               ),
               SizedBox(width: 20,),
@@ -231,6 +247,6 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     ),
-  );
+  );}
 
 }

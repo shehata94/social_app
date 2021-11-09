@@ -3,7 +3,6 @@ class UserModel{
    String bio;
    String email;
    String phone;
-   String password;
    String coverImage;
    String profileImage;
    String uid;
@@ -13,7 +12,6 @@ class UserModel{
     this.bio,
     this.email,
     this.phone,
-    this.password,
     this.coverImage,
     this.profileImage,
     this.uid
@@ -24,7 +22,6 @@ class UserModel{
     bio = json['bio'];
     email = json['email'];
     phone = json['phone'];
-    password = json['password'];
     coverImage = json['coverImage'];
     profileImage = json['profileImage'];
     uid = json['uid'];
@@ -37,7 +34,6 @@ class UserModel{
           'bio': bio,
           'email': email,
           'phone': phone,
-          'password': password,
           'coverImage': coverImage,
           'profileImage': profileImage,
           'uid': uid

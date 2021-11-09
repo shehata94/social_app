@@ -37,3 +37,30 @@ class HomeUploadImageErrorState extends HomeStates{}
 
 class HomeUploadThenGetURLImageErrorState extends HomeStates{}
 
+class HomePostsScreenState extends HomeStates{}
+
+//Create post
+class PostGetImageSuccessState extends HomeStates{}
+
+class PostGetImageErrorState extends HomeStates{}
+
+class PostRemoveImageState extends HomeStates{}
+
+class PostUploadImageSuccessState extends HomeStates{}
+
+class PostUploadImageErrorState extends HomeStates{}
+
+class PostCreatePostSuccessState extends HomeStates{}
+
+class PostCreatePostErrorState extends HomeStates{}
+
+class PostCreatePostLoadingState extends HomeStates{}
+
+//GetPosts
+
+class HomeGetPostsSuccessState extends HomeStates{}
+
+class HomeGetPostsErrorState extends HomeStates{}
+
+class HomeGetPostsLoadingState extends HomeStates{}
+

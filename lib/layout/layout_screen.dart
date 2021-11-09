@@ -6,6 +6,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/layout/cubit/cubit.dart';
 import 'package:social_app/layout/cubit/states.dart';
+import 'package:social_app/modules/posts/posts_screen.dart';
+import 'package:social_app/shared/components/components.dart';
 
 import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/styles/icon_broken.dart';
@@ -14,7 +16,12 @@ class LayoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state){},
+      listener: (context, state){
+        if(state is HomePostsScreenState)
+          {
+            navigateTo(context, PostsScreen());
+          }
+      },
       builder: (context, state){
         HomeCubit cubit = HomeCubit.get(context);
         return Scaffold(
