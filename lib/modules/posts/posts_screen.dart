@@ -25,7 +25,7 @@ class PostsScreen extends StatelessWidget {
                 postText: postController.text,
                 userModel: cubit.userModel,
                 date: DateTime.now().toString()
-              );
+              ).then((value) => Navigator.pop(context));
             },
           ),
           body: Padding(

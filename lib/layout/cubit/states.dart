@@ -64,3 +64,27 @@ class HomeGetPostsErrorState extends HomeStates{}
 
 class HomeGetPostsLoadingState extends HomeStates{}
 
+//setPostLikes
+class PostSetLikeSuccessState extends HomeStates{}
+
+class PostSetLikeErrorState extends HomeStates{}
+
+//CommentsShown
+class ChangeCommentsView extends HomeStates{}
+
+//comments get
+class GetCommentsLoadingState extends HomeStates{}
+
+class GetCommentsSuccessState extends HomeStates{}
+
+class GetCommentsErrorState extends HomeStates{}
+
+//Update userModel in posts
+class UpdateUserModelInPostsSuccessState extends HomeStates{}
+
+//Like pressed
+class ChangeLikeState extends HomeStates{}
+
+
+
+

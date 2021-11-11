@@ -1,38 +1,36 @@
+import 'package:social_app/models/user_model.dart';
+
 class PostModel{
-  String name;
   String date;
   String postText;
   String postImage;
-  String profileImage;
   String uid;
+  UserModel userModel;
 
   PostModel({
-    this.name,
     this.date,
     this.postText,
     this.postImage,
-    this.profileImage,
-    this.uid
+    this.uid,
+    this.userModel
   });
 
   PostModel.fromJson(Map<String, dynamic> json){
-    name = json['name'];
     date = json['date'];
     postText = json['postText'];
     postImage = json['postImage'];
-    profileImage = json['profileImage'];
-    uid = json['uid'];
+    uid = UserModel.fromJson(json['userModel']).uid;
+    userModel = UserModel.fromJson(json['userModel']);
   }
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap(UserModel userModel){
     return
       {
-        'name': name,
         'date': date,
         'postText': postText,
         'postImage': postImage??'',
-        'profileImage': profileImage,
-        'uid': uid
+        'uid': userModel.toMap()['uid'],
+        'userModel': userModel.toMap()
       };
   }
 

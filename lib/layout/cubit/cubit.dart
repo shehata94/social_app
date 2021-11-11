@@ -1,12 +1,14 @@
-
 import 'dart:io';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/layout/cubit/states.dart';
+import 'package:social_app/models/comment_model.dart';
 import 'package:social_app/models/post_model.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/modules/chats/chats_screen.dart';
@@ -18,73 +20,47 @@ import 'package:social_app/shared/components/constants.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:social_app/shared/network/local/cache_helper.dart';
 
-class HomeCubit extends Cubit<HomeStates>{
-
+class HomeCubit extends Cubit<HomeStates> {
   HomeCubit() : super(HomeInitState());
 
   static HomeCubit get(context) => BlocProvider.of(context);
 
   int currentIndex = 0;
 
-  List<Widget> screens = [
-    HomeScreen(),
-    ChatsScreen(),
-    PostsScreen(),
-    UsersScreen(),
-    SettingsScreen()
-  ];
+  List<Widget> screens = [HomeScreen(), ChatsScreen(), PostsScreen(), UsersScreen(), SettingsScreen()];
 
-  void changeBotNavBar(int index){
-
-
-
-    if(index ==2 )
-      {
-        emit(HomePostsScreenState());
-      }else{
+  void changeBotNavBar(int index) {
+    if (index == 2) {
+      emit(HomePostsScreenState());
+    } else {
       currentIndex = index;
       emit(HomeChangeBotNavBar());
     }
-
-
   }
 
   UserModel userModel;
-  void getUserData(){
+  void getUserData() {
     emit(HomeGetUserLoadingState());
 
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get()
-        .then((value){
-         userModel = UserModel.fromJson(value.data());
-         print(userModel.toMap());
-         emit(HomeGetUserSuccessState());
-
-    }).catchError((error){
+    FirebaseFirestore.instance.collection('users').doc(uid).get().then((value) {
+      userModel = UserModel.fromJson(value.data());
+      emit(HomeGetUserSuccessState());
+    }).catchError((error) {
       emit(HomeGetUserErrorState());
-
     });
   }
 
-
-  void getUserDataById(String uid){
+  Future<UserModel> getUserDataById(String uid) async {
+    UserModel model;
     emit(HomeGetUserLoadingState());
 
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get()
-        .then((value){
-      userModel = UserModel.fromJson(value.data());
-      print(userModel.toMap());
+    await FirebaseFirestore.instance.collection('users').doc(uid).get().then((value) {
+      model = UserModel.fromJson(value.data());
       emit(HomeGetUserSuccessState());
-
-    }).catchError((error){
+    }).catchError((error) {
       emit(HomeGetUserErrorState());
-
     });
+    return model;
   }
 
   File coverImage;
@@ -94,13 +70,13 @@ class HomeCubit extends Cubit<HomeStates>{
 
   Future<void> getCoverImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        coverImage = File(pickedFile.path);
-        emit(HomeGetCoverImageSuccessState());
-      } else {
-        print('No image selected.');
-        emit(HomeGetCoverImageErrorState());
-      }
+    if (pickedFile != null) {
+      coverImage = File(pickedFile.path);
+      emit(HomeGetCoverImageSuccessState());
+    } else {
+      print('No image selected.');
+      emit(HomeGetCoverImageErrorState());
+    }
   }
 
   Future<void> getProfileImage() async {
@@ -108,222 +84,250 @@ class HomeCubit extends Cubit<HomeStates>{
     if (pickedFile != null) {
       profileImage = File(pickedFile.path);
       emit(HomeGetProfileImageSuccessState());
-
     } else {
       print('No image selected.');
       emit(HomeGetProfileImageErrorState());
-
     }
   }
 
-  void updateUserData({
-     String name,
-     String phone,
-     String bio,
-     String cover,
-     String profile
-}){
-
+  Future<void> updateUserData({String name, String phone, String bio, String cover, String profile}) async {
     userModel = UserModel(
-      name: name,
-      email: userModel.email,
-      phone: phone,
-      bio:bio,
-      uid: userModel.uid,
-      coverImage: cover??userModel.coverImage,
-      profileImage: profile??userModel.profileImage
-    );
+        name: name,
+        email: userModel.email,
+        phone: phone,
+        bio: bio,
+        uid: userModel.uid,
+        coverImage: cover ?? userModel.coverImage,
+        profileImage: profile ?? userModel.profileImage);
 
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .update(userModel.toMap())
-        .then((value) {
-      getUserData();
+   await FirebaseFirestore.instance.collection('users').doc(uid).update(userModel.toMap()).then((value) {
       emit(HomeUpdateUserDataSuccessState());
-
-    }).catchError((error){
+    }).catchError((error) {
       emit(HomeUpdateUserDataErrorState());
     });
-
   }
 
-
-
-
-
-  Future<String> uploadImage (File image){
-    return firebase_storage.FirebaseStorage.instance
-        .ref('users/${image.uri.pathSegments.last}')
-        .putFile(image)
-        .then((value) {
-       return value.ref.getDownloadURL();
-    }).catchError((error){
-       emit(HomeUploadImageErrorState());
+  Future<String> uploadImage(File image) {
+    return firebase_storage.FirebaseStorage.instance.ref('users/${image.uri.pathSegments.last}').putFile(image).then((value) {
+      return value.ref.getDownloadURL();
+    }).catchError((error) {
+      emit(HomeUploadImageErrorState());
     });
   }
 
   String newCoverURL;
   String newProfileURL;
 
-  void uploadImagesAndData({
+  Future<void> uploadImagesAndData({
     String name,
     String phone,
     String bio,
-  }) {
+  }) async {
     emit(HomeUpdateUserDataLoadingState());
 
-    if(coverImage != null)
-    {
-      uploadImage(coverImage).then((value) {
+    
+
+    if (coverImage != null) {
+      await uploadImage(coverImage).then((value) {
         newCoverURL = value;
-        updateUserData(
-            name: name,
-            phone: phone,
-            bio: bio,
-            cover: newCoverURL,
-            profile: newProfileURL
-        );
-      }).catchError((error){
+        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL).then((value) => updateUserModelInPosts().then((value) {   getUserData();
+        getPosts();}));
+      }).catchError((error) {
         emit(HomeUploadThenGetURLImageErrorState());
       });
     }
-    if(profileImage != null)
-    {
-      uploadImage(profileImage).then((value) {
-        newProfileURL =value;
-        updateUserData(
-            name: name,
-            phone: phone,
-            bio: bio,
-            cover: newCoverURL,
-            profile: newProfileURL
-        );
-      }).catchError((error){
+    if (profileImage != null) {
+      await uploadImage(profileImage).then((value) {
+        newProfileURL = value;
+        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL).then((value) => updateUserModelInPosts().then((value) {   getUserData();
+        getPosts();}));
+      }).catchError((error) {
         emit(HomeUploadThenGetURLImageErrorState());
       });
     }
-    if(profileImage == null && coverImage == null){
-      updateUserData(
-          name: name,
-          phone: phone,
-          bio: bio,
-      );
+    if (profileImage == null && coverImage == null) {
+      await updateUserData(
+        name: name,
+        phone: phone,
+        bio: bio,
+      ).then((value) => updateUserModelInPosts().then((value) {
+        getUserData();
+        getPosts();
+      } ));
     }
   }
 
   //CreatePost
   File postImage;
 
-
   Future<void> getPostImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       postImage = File(pickedFile.path);
       emit(PostGetImageSuccessState());
-
     } else {
       print('No image selected.');
       emit(PostGetImageErrorState());
-
     }
   }
 
-  void removePostImage(){
+  void removePostImage() {
     postImage = null;
     emit(PostRemoveImageState());
-
   }
 
   String newPostImageURL;
   Future<String> uploadPostImage() {
-
-     return firebase_storage.FirebaseStorage.instance
-        .ref('posts/${postImage.uri.pathSegments.last}')
-        .putFile(postImage)
-        .then((value) {
-       emit(PostUploadImageSuccessState());
-        return value.ref.getDownloadURL();
-    })
-        .catchError((error){
+    return firebase_storage.FirebaseStorage.instance.ref('posts/${postImage.uri.pathSegments.last}').putFile(postImage).then((value) {
+      emit(PostUploadImageSuccessState());
+      return value.ref.getDownloadURL();
+    }).catchError((error) {
       emit(PostUploadImageErrorState());
     });
   }
 
   PostModel postModel;
 
-  void createPost({
-    String postText,
-    UserModel userModel,
-    String date
-  }){
+  Future<void> createPost({String postText, UserModel userModel, String date}) async {
     emit(PostCreatePostLoadingState());
 
+    if (postImage != null) {
+      await uploadPostImage().then((value) {
+        postModel = PostModel(date: date, userModel: userModel, postText: postText, postImage: value ?? '');
 
-    if(postImage != null){
-      uploadPostImage().then((value) {
-        postModel = PostModel(
-            name: userModel.name,
-            date: date,
-            uid: userModel.uid,
-            profileImage: userModel.profileImage,
-            postText: postText,
-            postImage: value??''
-        );
-
-        FirebaseFirestore.instance
-            .collection('posts')
-            .doc()
-            .set(postModel.toMap())
-            .then((value) {
-
+        FirebaseFirestore.instance.collection('posts').doc().set(postModel.toMap(userModel)).then((value) {
           emit(PostCreatePostSuccessState());
-
-        }).catchError((error){
+        }).catchError((error) {
           emit(PostCreatePostErrorState());
         });
       });
-    }else{
+    } else {
       postModel = PostModel(
-          name: userModel.name,
-          date: date,
-          uid: userModel.uid,
-          profileImage: userModel.profileImage,
-          postText: postText,
+        date: date,
+        userModel: userModel,
+        postText: postText,
       );
 
-      FirebaseFirestore.instance
-          .collection('posts')
-          .doc()
-          .set(postModel.toMap())
-          .then((value) {
+      await FirebaseFirestore.instance.collection('posts').doc().set(postModel.toMap(userModel)).then((value) {
         emit(PostCreatePostSuccessState());
-      }).catchError((error){
+      }).catchError((error) {
         emit(PostCreatePostErrorState());
       });
-
     }
-
   }
 
   //GetPosts
-List<PostModel> posts = [];
-void getPosts(){
+  List<PostModel> posts = [];
+  List<String> postId = [];
+  List<int> likes = [];
+  List<int> comments = [];
+  List<bool> isCommentsShown = [];
+  List<bool> isLikePressed = [];
 
-  emit(HomeGetPostsLoadingState());
-    FirebaseFirestore.instance
-        .collection('posts')
-        .get()
-        .then((value) => {
-          value.docs.forEach((element) {
-            print(PostModel.fromJson(element.data()));
-            posts.add(PostModel.fromJson(element.data()));
-            emit(HomeGetPostsSuccessState());
-          })
-    }).catchError((error){
+  void changeLikeState(int index){
+    isLikePressed[index] = ! isLikePressed[index];
+    emit(ChangeLikeState());
+  }
+
+  void changeCommentsView(bool isShown, int index) {
+    isCommentsShown[index] = !isCommentsShown[index];
+    emit(ChangeCommentsView());
+    print(isCommentsShown);
+  }
+
+  void getPosts() {
+    posts =[];
+    emit(HomeGetPostsLoadingState());
+
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        getLikesAndCommentsCount(element.id).then((value) {
+          likes.add(value["numLikes"]);
+          comments.add(value["numComments"]);
+          isLikePressed.add(value['isLikePressed']);
+          isCommentsShown.add(false);
+
+          postId.add(element.id);
+          posts.add(PostModel.fromJson(element.data()));
+          emit(HomeGetPostsSuccessState());
+        }).catchError((error) {});
+      });
+    }).catchError((error) {
       emit(HomeGetPostsErrorState());
     });
-}
+  }
 
 
+
+  Future<Map<String, dynamic>> getLikesAndCommentsCount(String postId) async {
+    bool likePressed;
+   QuerySnapshot likes =  await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get();
+   QuerySnapshot comments =  await FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').get();
+   emit(GetCommentsSuccessState());
+   await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get().then((value) {
+     value.docs.forEach((element) {
+       if(element.id == userModel.uid)
+         return likePressed = true;
+       else
+         return likePressed = false;
+     });
+   });
+   return {"numLikes": likes.docs.length, "numComments": comments.docs.length, "isLikePressed": likePressed};
+
+  }
+
+  List<List<CommentModel>> commentsModel = [[],[],[],[]];
+
+  void getComments(String postId, int index) {
+    commentsModel = [[],[],[]];
+    emit(GetCommentsLoadingState());
+    FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').get().then((value) {
+      value.docs.forEach((element) {
+        commentsModel[index].add(CommentModel.fromJson(element.data()));
+        emit(GetCommentsSuccessState());
+      });
+    }).catchError((error) {
+      emit(GetCommentsErrorState());
+    });
+  }
+
+  Future<void> updateUserModelInPosts() async {
+    await FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        if (PostModel.fromJson(element.data()).uid == userModel.uid) {
+          element.reference.update({'userModel': userModel.toMap()});
+          emit(UpdateUserModelInPostsSuccessState());
+
+        }
+      });
+
+    });
+  }
+
+//add likes
+  void addLike(String postId) {
+    FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(userModel.uid).set({"like": true}).then((value) {
+      emit(PostSetLikeSuccessState());
+      getLikesAndCommentsCount(postId);
+    }).catchError((error) {
+      emit(PostSetLikeErrorState());
+    });
+  }
+
+//add comment
+  Future<void> addComment(String postId, String commentText, String date,int index) {
+    CommentModel commentModel = CommentModel(userModel: userModel, commentText: commentText, date: date);
+    return FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').doc().set(commentModel.toMap(userModel)).then((value) {
+      getLikesAndCommentsCount(postId).then((value) {
+        likes[index]= value['numLikes'];
+        comments[index]= value['numComments'];
+        emit(PostSetLikeSuccessState());
+
+      });
+      getComments(postId, index);
+      return value;
+    }).catchError((error) {
+      emit(PostSetLikeErrorState());
+    });
+  }
 }

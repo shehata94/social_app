@@ -28,15 +28,16 @@ class EditUserScreen extends StatelessWidget {
               context: context,
               title: "Edit Profile",
               actionText: "UPDATE",
-              onPressed: (){
-                cubit.uploadImagesAndData(
+              onPressed: ()async{
+               await cubit.uploadImagesAndData(
                     name: nameController.text,
                     phone: phoneController.text,
                     bio: bioController.text
-                );
+                ).then((value) => Navigator.pop(context));
               }
             ),
             body: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
