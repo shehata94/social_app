@@ -13,44 +13,54 @@ import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/styles/icon_broken.dart';
 
 class LayoutScreen extends StatelessWidget {
+  final String uid;
+
+  const LayoutScreen({Key key, this.uid}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state){
-        if(state is HomePostsScreenState)
-          {
-            navigateTo(context, PostsScreen());
-          }
-      },
-      builder: (context, state){
+    return Builder(
+      builder: (context){
         HomeCubit cubit = HomeCubit.get(context);
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'Home',
-              style: Theme.of(context).textTheme.headline6.copyWith(fontWeight: FontWeight.bold),
-            ),
-            actions: [
-              IconButton(onPressed: () {}, icon: Icon(IconBroken.Notification)),
-              IconButton(onPressed: () {}, icon: Icon(IconBroken.Search)),
-            ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: cubit.currentIndex,
-            onTap: (index){
-              cubit.changeBotNavBar(index);
-            },
-            items: [
-              BottomNavigationBarItem(icon: Icon(IconBroken.Home),label: "Home"),
-              BottomNavigationBarItem(icon: Icon(IconBroken.Chat),label: "Chats"),
-              BottomNavigationBarItem(icon: Icon(IconBroken.Arrow___Up_Square),label: "Post"),
-              BottomNavigationBarItem(icon: Icon(IconBroken.User),label: "Users"),
-              BottomNavigationBarItem(icon: Icon(IconBroken.Setting),label: "Settings"),
-            ],
-          ),
-          body: cubit.screens[cubit.currentIndex]
+        cubit.getUserData(uid);
+
+        return BlocConsumer<HomeCubit, HomeStates>(
+          listener: (context, state){
+            if(state is HomePostsScreenState)
+            {
+              navigateTo(context, PostsScreen());
+            }
+          },
+          builder: (context, state){
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    'Home',
+                    style: Theme.of(context).textTheme.headline6.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  actions: [
+                    IconButton(onPressed: () {}, icon: Icon(IconBroken.Notification)),
+                    IconButton(onPressed: () {}, icon: Icon(IconBroken.Search)),
+                  ],
+                ),
+                bottomNavigationBar: BottomNavigationBar(
+                  currentIndex: cubit.currentIndex,
+                  onTap: (index){
+                    cubit.changeBotNavBar(index);
+                  },
+                  items: [
+                    BottomNavigationBarItem(icon: Icon(IconBroken.Home),label: "Home"),
+                    BottomNavigationBarItem(icon: Icon(IconBroken.Chat),label: "Chats"),
+                    BottomNavigationBarItem(icon: Icon(IconBroken.Arrow___Up_Square),label: "Post"),
+                    BottomNavigationBarItem(icon: Icon(IconBroken.User),label: "Users"),
+                    BottomNavigationBarItem(icon: Icon(IconBroken.Setting),label: "Settings"),
+                  ],
+                ),
+                body: cubit.screens[cubit.currentIndex]
+            );
+          },
+
         );
-      },
+      }
 
     );
   }

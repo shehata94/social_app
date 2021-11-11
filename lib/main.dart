@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit()..getUserData()..getPosts(),
+      create: (context) => HomeCubit()..getUserData(uid)..getPosts()..getAllUsers(),
       child: MaterialApp(
         title: 'Social App',
         theme: lightTheme,

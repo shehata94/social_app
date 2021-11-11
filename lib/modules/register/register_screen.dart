@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app/layout/layout_screen.dart';
 import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/modules/register/cubit/cubit.dart';
 import 'package:social_app/modules/register/cubit/states.dart';
@@ -23,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is RegisterCreateUserSuccessState) {
                 CacheHelper.setData(key: 'uid', value: state.uid).then((value) {
-                  navigateAndFinish(context, HomeScreen());
+                  navigateAndFinish(context, LayoutScreen(uid: state.uid,));
                 });
 
               }

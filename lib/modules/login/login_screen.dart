@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:social_app/layout/layout_screen.dart';
 import 'package:social_app/modules/home/home_screen.dart';
 import 'package:social_app/modules/login/cubit/cubit.dart';
 import 'package:social_app/modules/login/cubit/states.dart';
@@ -26,7 +27,7 @@ class LoginScreen extends StatelessWidget {
                 CacheHelper.setData(key: 'uid', value: state.uid).then((value) {
                   // // Important when you logout so you should have the token saved when login again as token saved only in main initialization
                   // token = state.loginModel.data.token;
-                  navigateAndFinish(context, HomeScreen());
+                  navigateAndFinish(context, LayoutScreen(uid: state.uid,));
                 });
               } else if (state is LoginErrorState) {
                 toastMessage("Login Failed", 'Error');

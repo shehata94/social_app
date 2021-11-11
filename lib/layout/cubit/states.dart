@@ -85,6 +85,13 @@ class UpdateUserModelInPostsSuccessState extends HomeStates{}
 //Like pressed
 class ChangeLikeState extends HomeStates{}
 
+//Get all users chats
+class GetAllUsersLoadingState extends HomeStates{}
+
+class GetAllUsersSuccessState extends HomeStates{}
+
+class GetAllUsersErrorState extends HomeStates{}
+
 
 
 

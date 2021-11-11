@@ -5,7 +5,6 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/layout/cubit/states.dart';
 import 'package:social_app/models/comment_model.dart';
@@ -39,7 +38,8 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   UserModel userModel;
-  void getUserData() {
+
+  void getUserData(String uid) {
     emit(HomeGetUserLoadingState());
 
     FirebaseFirestore.instance.collection('users').doc(uid).get().then((value) {
@@ -100,7 +100,7 @@ class HomeCubit extends Cubit<HomeStates> {
         coverImage: cover ?? userModel.coverImage,
         profileImage: profile ?? userModel.profileImage);
 
-   await FirebaseFirestore.instance.collection('users').doc(uid).update(userModel.toMap()).then((value) {
+    await FirebaseFirestore.instance.collection('users').doc(uid).update(userModel.toMap()).then((value) {
       emit(HomeUpdateUserDataSuccessState());
     }).catchError((error) {
       emit(HomeUpdateUserDataErrorState());
@@ -125,13 +125,14 @@ class HomeCubit extends Cubit<HomeStates> {
   }) async {
     emit(HomeUpdateUserDataLoadingState());
 
-    
-
     if (coverImage != null) {
       await uploadImage(coverImage).then((value) {
         newCoverURL = value;
-        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL).then((value) => updateUserModelInPosts().then((value) {   getUserData();
-        getPosts();}));
+        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL)
+            .then((value) => updateUserModelInPosts().then((value) {
+                  getUserData(uid);
+                  getPosts();
+                }));
       }).catchError((error) {
         emit(HomeUploadThenGetURLImageErrorState());
       });
@@ -139,8 +140,11 @@ class HomeCubit extends Cubit<HomeStates> {
     if (profileImage != null) {
       await uploadImage(profileImage).then((value) {
         newProfileURL = value;
-        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL).then((value) => updateUserModelInPosts().then((value) {   getUserData();
-        getPosts();}));
+        updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL)
+            .then((value) => updateUserModelInPosts().then((value) {
+                  getUserData(uid);
+                  getPosts();
+                }));
       }).catchError((error) {
         emit(HomeUploadThenGetURLImageErrorState());
       });
@@ -151,9 +155,9 @@ class HomeCubit extends Cubit<HomeStates> {
         phone: phone,
         bio: bio,
       ).then((value) => updateUserModelInPosts().then((value) {
-        getUserData();
-        getPosts();
-      } ));
+            getUserData(uid);
+            getPosts();
+          }));
     }
   }
 
@@ -177,6 +181,7 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   String newPostImageURL;
+
   Future<String> uploadPostImage() {
     return firebase_storage.FirebaseStorage.instance.ref('posts/${postImage.uri.pathSegments.last}').putFile(postImage).then((value) {
       emit(PostUploadImageSuccessState());
@@ -224,8 +229,8 @@ class HomeCubit extends Cubit<HomeStates> {
   List<bool> isCommentsShown = [];
   List<bool> isLikePressed = [];
 
-  void changeLikeState(int index){
-    isLikePressed[index] = ! isLikePressed[index];
+  void changeLikeState(int index) {
+    isLikePressed[index] = !isLikePressed[index];
     emit(ChangeLikeState());
   }
 
@@ -236,7 +241,7 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   void getPosts() {
-    posts =[];
+    posts = [];
     emit(HomeGetPostsLoadingState());
 
     FirebaseFirestore.instance.collection('posts').get().then((value) {
@@ -257,29 +262,26 @@ class HomeCubit extends Cubit<HomeStates> {
     });
   }
 
-
-
   Future<Map<String, dynamic>> getLikesAndCommentsCount(String postId) async {
     bool likePressed;
-   QuerySnapshot likes =  await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get();
-   QuerySnapshot comments =  await FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').get();
-   emit(GetCommentsSuccessState());
-   await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get().then((value) {
-     value.docs.forEach((element) {
-       if(element.id == userModel.uid)
-         return likePressed = true;
-       else
-         return likePressed = false;
-     });
-   });
-   return {"numLikes": likes.docs.length, "numComments": comments.docs.length, "isLikePressed": likePressed};
-
+    QuerySnapshot likes = await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get();
+    QuerySnapshot comments = await FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').get();
+    emit(GetCommentsSuccessState());
+    await FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.id == userModel.uid)
+          return likePressed = true;
+        else
+          return likePressed = false;
+      });
+    });
+    return {"numLikes": likes.docs.length, "numComments": comments.docs.length, "isLikePressed": likePressed};
   }
 
-  List<List<CommentModel>> commentsModel = [[],[],[],[]];
+  List<List<CommentModel>> commentsModel = [[], [], [], []];
 
   void getComments(String postId, int index) {
-    commentsModel = [[],[],[]];
+    commentsModel = [[], [], []];
     emit(GetCommentsLoadingState());
     FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').get().then((value) {
       value.docs.forEach((element) {
@@ -297,10 +299,8 @@ class HomeCubit extends Cubit<HomeStates> {
         if (PostModel.fromJson(element.data()).uid == userModel.uid) {
           element.reference.update({'userModel': userModel.toMap()});
           emit(UpdateUserModelInPostsSuccessState());
-
         }
       });
-
     });
   }
 
@@ -315,19 +315,39 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
 //add comment
-  Future<void> addComment(String postId, String commentText, String date,int index) {
+  Future<void> addComment(String postId, String commentText, String date, int index) {
     CommentModel commentModel = CommentModel(userModel: userModel, commentText: commentText, date: date);
     return FirebaseFirestore.instance.collection('posts').doc(postId).collection('comment').doc().set(commentModel.toMap(userModel)).then((value) {
       getLikesAndCommentsCount(postId).then((value) {
-        likes[index]= value['numLikes'];
-        comments[index]= value['numComments'];
+        likes[index] = value['numLikes'];
+        comments[index] = value['numComments'];
         emit(PostSetLikeSuccessState());
-
       });
       getComments(postId, index);
       return value;
     }).catchError((error) {
       emit(PostSetLikeErrorState());
+    });
+  }
+
+  //GetUsers for chats
+
+  List<UserModel> users= [];
+  void getAllUsers() {
+    emit(GetAllUsersLoadingState());
+    if(users.length != 0)
+    FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) {
+          emit(GetAllUsersSuccessState());
+          value.docs.forEach((element) {
+            if(element.id != userModel.uid)
+            users.add(UserModel.fromJson(element.data()));
+          });
+    })
+        .catchError((error) {
+          emit(GetAllUsersErrorState());
     });
   }
 }

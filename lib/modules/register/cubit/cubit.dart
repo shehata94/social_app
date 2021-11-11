@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/modules/register/cubit/states.dart';
+import 'package:social_app/shared/components/constants.dart';
+import 'package:social_app/shared/network/local/cache_helper.dart';
 
 class RegisterCubit extends Cubit<RegisterCubitStates> {
   RegisterCubit() : super(RegisterInitState());
@@ -42,18 +44,28 @@ class RegisterCubit extends Cubit<RegisterCubitStates> {
     @required String email,
     @required String phone,
     @required String uid,
+    String profile,
+    String cover,
+    String bio
 }){
     UserModel userModel = UserModel(
       name: name,
       email: email,
       phone: phone,
-      uid: uid
+      uid: uid,
+      bio: bio??"Write your Bio ...",
+      coverImage: cover??"https://image.freepik.com/free-photo/woman-hand-blue-sweater-breaking-through-paper-wall-pointing-copy-space_273609-46465.jpg" ,
+      profileImage: profile??"https://image.freepik.com/free-vector/hacker-realistic-composition_98292-38.jpg?1"
     );
     FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .set(userModel.toMap())
         .then((value) {
+          CacheHelper.clearData(key: 'uid').then((value) {
+            uid = userModel.uid;
+            CacheHelper.setData(key: 'uid', value: uid);
+          });
           emit(RegisterCreateUserSuccessState(uid));
 
     }).catchError((error){

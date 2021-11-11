@@ -92,10 +92,16 @@ void toastMessage(String msg, toastStates) {
       fontSize: 16.0);
 }
 
-Widget divider() => Container(
-      height: 1,
-      color: Colors.grey,
-    );
+Widget divider() => Padding(
+  padding: const EdgeInsets.all(12.0),
+  child:   Container(
+
+        height: 1,
+
+        color: Colors.grey[300],
+
+      ),
+);
 
 Widget listItem(model, cubit, {bool isSearch = true}) => Padding(
       padding: const EdgeInsets.all(10.0),
