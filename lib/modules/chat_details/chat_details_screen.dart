@@ -12,7 +12,7 @@ import 'package:social_app/shared/styles/icon_broken.dart';
 
 class ChatDetailsScreen extends StatelessWidget {
   final UserModel model;
-
+  final ScrollController _scrollController = ScrollController();
     ChatDetailsScreen({Key key, this.model}) : super(key: key);
 
   @override
@@ -23,7 +23,7 @@ class ChatDetailsScreen extends StatelessWidget {
 
     return Builder(
       builder: (context) {
-        ScrollController scrollController;
+
         cubit.getMessages(receiverUid: model.uid);
         return BlocConsumer<HomeCubit, HomeStates>(
           listener: (context, state) {},
@@ -54,7 +54,8 @@ class ChatDetailsScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: ListView.separated(
-                                controller: scrollController,
+                                reverse: true,
+                                controller: _scrollController,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index){
                                   var message = cubit.messages[index];
@@ -101,9 +102,12 @@ class ChatDetailsScreen extends StatelessWidget {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Timer(Duration(milliseconds: 500),
-                                              () => scrollController.jumpTo(scrollController.position.maxScrollExtent));
-                                      cubit.createMessage(
+                                      _scrollController.animateTo(
+                                          _scrollController.position.minScrollExtent,
+                                          duration: Duration(milliseconds: 200),
+                                          curve: Curves.easeInOut
+                                      );
+                                           cubit.createMessage(
                                               senderUid: cubit.userModel.uid,
                                               receiverUid: model.uid,
                                               date: DateTime.now().toString(),

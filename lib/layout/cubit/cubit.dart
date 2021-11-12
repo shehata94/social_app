@@ -402,7 +402,7 @@ void getMessages({String receiverUid}){
         .collection('messages')
         .doc(receiverUid)
         .collection('content')
-        .orderBy('date')
+        .orderBy('date',descending: true)
         .snapshots()
         .listen((event) {
           messages = [];

@@ -20,6 +20,7 @@ class LayoutScreen extends StatelessWidget {
           builder: (context) {
             var cubit =HomeCubit.get(context);
             cubit.getUserData(uid);
+            cubit.getPosts();
             cubit.getAllUsers(uid);
             return BlocConsumer<HomeCubit, HomeStates>(
               listener: (context, state){

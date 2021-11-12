@@ -24,7 +24,7 @@ void main() async {
   print(uid);
   if (onBoarding != null) {
     if (uid != null)
-      widget = LayoutScreen();
+      widget = LayoutScreen(uid: uid,);
     else
       widget = LoginScreen();
   } else {
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit()..getUserData(uid)..getPosts()..getAllUsers(uid),
+      create: (context) => HomeCubit(),
       child: MaterialApp(
         title: 'Social App',
         theme: lightTheme,
