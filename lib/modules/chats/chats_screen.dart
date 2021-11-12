@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/layout/cubit/cubit.dart';
 import 'package:social_app/layout/cubit/states.dart';
 import 'package:social_app/models/user_model.dart';
+import 'package:social_app/modules/chat_details/chat_details_screen.dart';
 import 'package:social_app/shared/components/components.dart';
 
 class ChatsScreen extends StatelessWidget {
@@ -28,25 +29,24 @@ class ChatsScreen extends StatelessWidget {
     );
   }
 
-  Widget userItem(context, UserModel model) => Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: NetworkImage(model.profileImage),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                model.name,
-                style: Theme.of(context).textTheme.bodyText1,
-              ),
-            ],
-          ),
-        ],
-      );
+  Widget userItem(context, UserModel model) => InkWell(
+    onTap: (){
+      navigateTo(context, ChatDetailsScreen(model: model,));
+    },
+    child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(model.profileImage),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(
+              model.name,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ],
+        ),
+  );
 }

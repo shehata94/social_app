@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/layout/cubit/states.dart';
 import 'package:social_app/models/comment_model.dart';
+import 'package:social_app/models/message_model.dart';
 import 'package:social_app/models/post_model.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/modules/chats/chats_screen.dart';
@@ -32,6 +33,7 @@ class HomeCubit extends Cubit<HomeStates> {
     if (index == 2) {
       emit(HomePostsScreenState());
     } else {
+
       currentIndex = index;
       emit(HomeChangeBotNavBar());
     }
@@ -46,6 +48,7 @@ class HomeCubit extends Cubit<HomeStates> {
       userModel = UserModel.fromJson(value.data());
       emit(HomeGetUserSuccessState());
     }).catchError((error) {
+      print(error);
       emit(HomeGetUserErrorState());
     });
   }
@@ -100,7 +103,7 @@ class HomeCubit extends Cubit<HomeStates> {
         coverImage: cover ?? userModel.coverImage,
         profileImage: profile ?? userModel.profileImage);
 
-    await FirebaseFirestore.instance.collection('users').doc(uid).update(userModel.toMap()).then((value) {
+    await FirebaseFirestore.instance.collection('users').doc(userModel.uid).update(userModel.toMap()).then((value) {
       emit(HomeUpdateUserDataSuccessState());
     }).catchError((error) {
       emit(HomeUpdateUserDataErrorState());
@@ -130,7 +133,7 @@ class HomeCubit extends Cubit<HomeStates> {
         newCoverURL = value;
         updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL)
             .then((value) => updateUserModelInPosts().then((value) {
-                  getUserData(uid);
+                  getUserData(userModel.uid);
                   getPosts();
                 }));
       }).catchError((error) {
@@ -142,7 +145,7 @@ class HomeCubit extends Cubit<HomeStates> {
         newProfileURL = value;
         updateUserData(name: name, phone: phone, bio: bio, cover: newCoverURL, profile: newProfileURL)
             .then((value) => updateUserModelInPosts().then((value) {
-                  getUserData(uid);
+                  getUserData(userModel.uid);
                   getPosts();
                 }));
       }).catchError((error) {
@@ -155,7 +158,7 @@ class HomeCubit extends Cubit<HomeStates> {
         phone: phone,
         bio: bio,
       ).then((value) => updateUserModelInPosts().then((value) {
-            getUserData(uid);
+            getUserData(userModel.uid);
             getPosts();
           }));
     }
@@ -333,21 +336,80 @@ class HomeCubit extends Cubit<HomeStates> {
   //GetUsers for chats
 
   List<UserModel> users= [];
-  void getAllUsers() {
+  void getAllUsers(String uid) {
     emit(GetAllUsersLoadingState());
-    if(users.length != 0)
+    users = [];
     FirebaseFirestore.instance
         .collection('users')
         .get()
         .then((value) {
-          emit(GetAllUsersSuccessState());
           value.docs.forEach((element) {
-            if(element.id != userModel.uid)
+            if(element.id != uid)
             users.add(UserModel.fromJson(element.data()));
+            emit(GetAllUsersSuccessState());
           });
     })
         .catchError((error) {
+            print(error);
           emit(GetAllUsersErrorState());
     });
   }
+
+  // Create message
+void createMessage({String senderUid, String receiverUid,String date, String messageText})  {
+    MessageModel model = MessageModel(
+      senderUid: senderUid,
+      receiverUid: receiverUid,
+      date: date,
+      messageText: messageText
+    );
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(senderUid)
+        .collection('messages')
+        .doc(receiverUid)
+        .collection('content')
+        .add(model.toMap())
+    .then((value) {
+      emit(CreateMessageSuccessState());
+    })
+    .catchError((error){
+      emit(CreateMessageErrorState());
+    });
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(receiverUid)
+        .collection('messages')
+        .doc(senderUid)
+        .collection('content')
+        .add(model.toMap())
+        .then((value) {
+      emit(CreateMessageSuccessState());
+    })
+        .catchError((error){
+      emit(CreateMessageErrorState());
+    });
+}
+
+// Get messages
+List<MessageModel> messages = [];
+void getMessages({String receiverUid}){
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userModel.uid)
+        .collection('messages')
+        .doc(receiverUid)
+        .collection('content')
+        .orderBy('date')
+        .snapshots()
+        .listen((event) {
+          messages = [];
+          event.docs.forEach((element) {
+            messages.add(MessageModel.fromJson(element.data()));
+          });
+          emit(GetMessagesSuccessState());
+    });
+}
 }

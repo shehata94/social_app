@@ -5,8 +5,6 @@ import 'package:social_app/shared/network/local/cache_helper.dart';
 
 import 'components.dart';
 
-var uid;
-UserModel userModel;
 
 void signOut(BuildContext context){
   CacheHelper.clearData(key: 'uid').then((value) {

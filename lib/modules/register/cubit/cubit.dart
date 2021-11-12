@@ -19,7 +19,6 @@ class RegisterCubit extends Cubit<RegisterCubitStates> {
     String phone,
     @required String password
 }) {
-    UserModel userModel = UserModel() ;
     emit(RegisterLoadingState());
     FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,

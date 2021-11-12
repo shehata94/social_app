@@ -92,6 +92,15 @@ class GetAllUsersSuccessState extends HomeStates{}
 
 class GetAllUsersErrorState extends HomeStates{}
 
+//create message
+class CreateMessageSuccessState extends HomeStates{}
+
+class CreateMessageErrorState extends HomeStates{}
+
+//Get Messages
+
+class GetMessagesSuccessState extends HomeStates{}
+
 
 
 

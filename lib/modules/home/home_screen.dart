@@ -127,7 +127,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 Spacer(),
-                IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz))
+                Expanded(child: IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz)))
               ],
             ),
             Container(

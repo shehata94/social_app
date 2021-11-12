@@ -28,7 +28,7 @@ class EditUserScreen extends StatelessWidget {
               context: context,
               title: "Edit Profile",
               actionText: "UPDATE",
-              onPressed: ()async{
+              onPressed: () async{
                await cubit.uploadImagesAndData(
                     name: nameController.text,
                     phone: phoneController.text,
